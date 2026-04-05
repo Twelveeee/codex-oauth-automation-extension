@@ -311,9 +311,35 @@ chrome.runtime.onMessage.addListener((message) => {
 });
 
 // ============================================================
+// Theme Toggle
+// ============================================================
+
+const btnTheme = document.getElementById('btn-theme');
+
+function setTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem('multipage-theme', theme);
+}
+
+function initTheme() {
+  const saved = localStorage.getItem('multipage-theme');
+  if (saved) {
+    setTheme(saved);
+  } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    setTheme('dark');
+  }
+}
+
+btnTheme.addEventListener('click', () => {
+  const current = document.documentElement.getAttribute('data-theme');
+  setTheme(current === 'dark' ? 'light' : 'dark');
+});
+
+// ============================================================
 // Init
 // ============================================================
 
+initTheme();
 restoreState().then(() => {
   updateButtonStates();
 });
