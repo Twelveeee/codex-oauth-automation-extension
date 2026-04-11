@@ -25,6 +25,10 @@
 
 console.log('[MultiPage:vps-panel] Content script loaded on', location.href);
 
+const {
+  isRecoverableStep9AuthFailure,
+} = self.MultiPageActivationUtils || {};
+
 // Listen for commands from Background
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === 'EXECUTE_STEP') {
@@ -111,12 +115,21 @@ async function waitForExactSuccessBadge(timeout = 30000) {
     if (statusText === '认证成功！') {
       return statusText;
     }
+    if (isOAuthCallbackTimeoutFailure(statusText)) {
+      throw new Error(`STEP9_OAUTH_TIMEOUT::${statusText}`);
+    }
+    if (typeof isRecoverableStep9AuthFailure === 'function' && isRecoverableStep9AuthFailure(statusText)) {
+      throw new Error(`STEP9_OAUTH_RETRY::${statusText}`);
+    }
     await sleep(200);
   }
 
   const finalText = getStatusBadgeText();
   if (isOAuthCallbackTimeoutFailure(finalText)) {
     throw new Error(`STEP9_OAUTH_TIMEOUT::${finalText}`);
+  }
+  if (typeof isRecoverableStep9AuthFailure === 'function' && isRecoverableStep9AuthFailure(finalText)) {
+    throw new Error(`STEP9_OAUTH_RETRY::${finalText}`);
   }
   throw new Error(finalText
     ? `CPA 面板状态不是“认证成功！”，当前为“${finalText}”。`
