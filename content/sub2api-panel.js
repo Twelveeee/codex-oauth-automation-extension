@@ -5,6 +5,9 @@ console.log('[MultiPage:sub2api-panel] Content script loaded on', location.href)
 const SUB2API_PANEL_LISTENER_SENTINEL = 'data-multipage-sub2api-panel-listener';
 const SUB2API_DEFAULT_GROUP_NAME = 'codex';
 const SUB2API_DEFAULT_REDIRECT_URI = 'http://localhost:1455/auth/callback';
+const SUB2API_DEFAULT_CONCURRENCY = 10;
+const SUB2API_DEFAULT_PRIORITY = 1;
+const SUB2API_DEFAULT_RATE_MULTIPLIER = 1;
 
 if (document.documentElement.getAttribute(SUB2API_PANEL_LISTENER_SENTINEL) !== '1') {
   document.documentElement.setAttribute(SUB2API_PANEL_LISTENER_SENTINEL, '1');
@@ -368,6 +371,9 @@ async function step9_submitOpenAiCallback(payload = {}) {
     platform: 'openai',
     type: 'oauth',
     credentials,
+    concurrency: SUB2API_DEFAULT_CONCURRENCY,
+    priority: SUB2API_DEFAULT_PRIORITY,
+    rate_multiplier: SUB2API_DEFAULT_RATE_MULTIPLIER,
     group_ids: [groupId],
     auto_pause_on_expired: true,
   };
