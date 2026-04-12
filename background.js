@@ -2211,6 +2211,7 @@ async function humanStepDelay(min = HUMAN_STEP_DELAY_MIN, max = HUMAN_STEP_DELAY
 }
 
 async function clickWithDebugger(tabId, rect) {
+  throwIfStopped();
   if (!tabId) {
     throw new Error('未找到用于调试点击的认证页面标签页。');
   }
@@ -2229,10 +2230,12 @@ async function clickWithDebugger(tabId, rect) {
   }
 
   try {
+    throwIfStopped();
     const x = Math.round(rect.centerX);
     const y = Math.round(rect.centerY);
 
     await chrome.debugger.sendCommand(target, 'Page.bringToFront');
+    throwIfStopped();
     await chrome.debugger.sendCommand(target, 'Input.dispatchMouseEvent', {
       type: 'mouseMoved',
       x,
@@ -2241,6 +2244,7 @@ async function clickWithDebugger(tabId, rect) {
       buttons: 0,
       clickCount: 0,
     });
+    throwIfStopped();
     await chrome.debugger.sendCommand(target, 'Input.dispatchMouseEvent', {
       type: 'mousePressed',
       x,
@@ -2249,6 +2253,7 @@ async function clickWithDebugger(tabId, rect) {
       buttons: 1,
       clickCount: 1,
     });
+    throwIfStopped();
     await chrome.debugger.sendCommand(target, 'Input.dispatchMouseEvent', {
       type: 'mouseReleased',
       x,
